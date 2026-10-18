@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Sanskari Samriti",
-    "slug": "samriti",
+    "slug": "sanskari-samriti",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -48,7 +48,7 @@
     "scheme": "sanskarisamriti",
     "extra": {
       "eas": {
-        "projectId": "6ec94aca-407b-4879-8c4a-279170bf3509"
+        "projectId": "3b7ee298-6f4a-4dbe-a558-9a68fa1f977d"
       },
       "router": {
         "asyncRoutes": {
@@ -56,6 +56,6 @@
         }
       }
     },
-    "owner": "thirumuruga"
+    "owner": "sanskari-samriti"
   }
 }
