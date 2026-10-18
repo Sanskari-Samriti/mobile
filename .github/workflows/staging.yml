@@ -1,0 +1,95 @@
+name: Staging builds
+
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  android:
+    name: Build and distribute Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify Android staging credentials are configured
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+          FIREBASE_TESTER_GROUP: ${{ vars.FIREBASE_TESTER_GROUP }}
+        run: |
+          if grep -q 'YOUR_EAS_PROJECT_ID' app.json; then
+            echo "::error::Link this app to EAS first by running npx eas-cli@latest init"
+            exit 1
+          fi
+          if [ -z "$EXPO_TOKEN" ] || [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ] || \
+             [ -z "$FIREBASE_APP_ID" ] || [ -z "$FIREBASE_TESTER_GROUP" ]; then
+            echo "::error::Configure EXPO_TOKEN and Firebase App Distribution GitHub secrets/variables; see docs/ci-cd.md"
+            exit 1
+          fi
+
+      - name: Build Android staging APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npx --yes eas-cli@latest build \
+            --platform android \
+            --profile staging \
+            --non-interactive \
+            --wait \
+            --json > eas-build.json
+
+      - name: Download Android staging APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          BUILD_ID="$(node -e '
+            const result = JSON.parse(require("node:fs").readFileSync("eas-build.json", "utf8"));
+            const build = Array.isArray(result) ? result.at(-1) : result.builds?.at(-1) ?? result;
+            const id = build.id ?? build.buildId;
+            if (!id) throw new Error("EAS did not return a build ID");
+            process.stdout.write(id);
+          ')"
+          npx --yes eas-cli@latest build:download \
+            --build-id "$BUILD_ID" \
+            --non-interactive
+          APK_PATH="$(find . -maxdepth 1 -type f -name '*.apk' -print -quit)"
+          if [ -z "$APK_PATH" ]; then
+            echo "::error::EAS did not download an APK"
+            exit 1
+          fi
+          echo "APK_PATH=$APK_PATH" >> "$GITHUB_ENV"
+
+      - name: Authenticate with Firebase
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+
+      - name: Distribute APK to Firebase testers
+        env:
+          FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
+          FIREBASE_TESTER_GROUP: ${{ vars.FIREBASE_TESTER_GROUP }}
+        run: |
+          if [ -z "$FIREBASE_APP_ID" ] || [ -z "$FIREBASE_TESTER_GROUP" ]; then
+            echo "::error::Set FIREBASE_APP_ID and FIREBASE_TESTER_GROUP repository variables"
+            exit 1
+          fi
+          npx --yes firebase-tools@latest appdistribution:distribute "$APK_PATH" \
+            --app "$FIREBASE_APP_ID" \
+            --groups "$FIREBASE_TESTER_GROUP" \
+            --release-notes "Staging build ${GITHUB_SHA}"

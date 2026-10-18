@@ -1,12 +1,14 @@
 {
   "expo": {
     "name": "Sanskari Samriti",
-    "slug": "sanskari-samriti",
+    "slug": "samriti",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.sanskarisamriti.app"
@@ -46,8 +48,14 @@
     "scheme": "sanskarisamriti",
     "extra": {
       "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
+        "projectId": "6ec94aca-407b-4879-8c4a-279170bf3509"
+      },
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
       }
-    }
+    },
+    "owner": "thirumuruga"
   }
 }

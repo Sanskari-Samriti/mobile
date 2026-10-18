@@ -1,5 +1,5 @@
 import * as FileSystem from 'expo-file-system/legacy'
-import * as MediaLibrary from 'expo-media-library'
+import * as MediaLibrary from 'expo-media-library/legacy'
 import { Alert, Linking } from 'react-native'
 
 // Downloads image to gallery — user can then set as wallpaper from Gallery app
