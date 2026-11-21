@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router'
 import { useAuth } from '../providers/AuthProvider'
 import { supabase } from '../lib/supabase'
 
-type Profile = { display_name: string | null; avatar_url: string | null }
+type Profile = { display_name: string | null; avatar_url: string | null; phone: string | null }
 
 export default function ProfileScreen() {
   const router = useRouter()
@@ -16,7 +16,7 @@ export default function ProfileScreen() {
     if (!user) { setProfile(null); return }
     supabase
       .from('user_profiles')
-      .select('display_name, avatar_url')
+      .select('display_name, avatar_url, phone')
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => setProfile(data))
@@ -40,7 +40,7 @@ export default function ProfileScreen() {
   }
 
   const name = profile?.display_name || user.email?.split('@')[0] || 'Devotee'
-  const contact = user.email || user.phone || ''
+  const contact = [user.email, profile?.phone].filter(Boolean).join('\n')
 
   function confirmSignOut() {
     Alert.alert('Sign out', 'Are you sure you want to sign out?', [
