@@ -43,7 +43,12 @@
           "icon": "./assets/notification-icon.png",
           "color": "#FF6B35"
         }
-      ]
+      ],
+      "expo-image",
+      "expo-secure-store",
+      "expo-sharing",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "scheme": "sanskarisamriti",
     "extra": {
