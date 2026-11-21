@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "289628902219",
+    "project_id": "sanskarisamriti",
+    "storage_bucket": "sanskarisamriti.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289628902219:android:0b070a4871e4c4b9140ece",
+        "android_client_info": {
+          "package_name": "com.sanskarisamriti.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAyQxsXmGWW1-gFWo9omxNpo_AyctF8xKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
