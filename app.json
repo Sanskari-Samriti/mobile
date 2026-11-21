@@ -52,15 +52,15 @@
     ],
     "scheme": "sanskarisamriti",
     "extra": {
+      "eas": {
+        "projectId": "3b7ee298-6f4a-4dbe-a558-9a68fa1f977d"
+      },
       "router": {
         "asyncRoutes": {
           "web": true
-        }
-      },
-      "eas": {
-        "projectId": "72c393ca-aefb-4a3e-984d-da7b83d19776"
+        }  
       }
     },
-    "owner": "tajulkhan"
+    "owner": "sanskari-samriti"
   }
 }
