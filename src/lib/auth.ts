@@ -97,10 +97,15 @@ export async function signInWithEmail(email: string, password: string) {
   return data
 }
 
-/** `needsConfirmation` is true when "Confirm email" is enabled in Supabase. */
+/**
+ * Creates the user and signs them in straight away (no email step) when
+ * "Confirm email" is OFF in Supabase. `needsConfirmation` is only true if the
+ * project still requires email confirmation.
+ */
 export async function signUpWithEmail(email: string, password: string, displayName?: string) {
+  const cleanEmail = email.trim()
   const { data, error } = await supabase.auth.signUp({
-    email: email.trim(),
+    email: cleanEmail,
     password,
     options: {
       emailRedirectTo: AUTH_REDIRECT_URL,
@@ -108,7 +113,18 @@ export async function signUpWithEmail(email: string, password: string, displayNa
     },
   })
   if (error) throw error
-  return { ...data, needsConfirmation: !data.session }
+  if (data.session) return { needsConfirmation: false }
+
+  // No session came back: either the email already exists or confirmation is still on.
+  const { data: signedIn, error: signInError } = await supabase.auth.signInWithPassword({
+    email: cleanEmail,
+    password,
+  })
+  if (signedIn?.session) return { needsConfirmation: false }
+  if (signInError && /invalid login credentials/i.test(signInError.message)) {
+    throw new Error('This email is already registered. Try signing in.')
+  }
+  return { needsConfirmation: true }
 }
 
 export async function signOut() {

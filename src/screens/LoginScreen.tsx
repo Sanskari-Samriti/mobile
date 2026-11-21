@@ -95,6 +95,7 @@ export default function LoginScreen() {
 
   const onEmailSubmit = () =>
     run('email', async () => {
+      if (isSignUp && !name.trim()) throw new Error('Enter your name')
       if (!isValidEmail(email)) throw new Error('Enter a valid email address')
       if (password.length < 6) throw new Error('Password must be at least 6 characters')
 
@@ -279,7 +280,7 @@ export default function LoginScreen() {
             <PrimaryButton
               label={isSignUp ? 'Create account' : 'Sign in'}
               loading={busy === 'email'}
-              disabled={loading || !email.trim() || !password}
+              disabled={loading || !email.trim() || !password || (isSignUp && !name.trim())}
               onPress={onEmailSubmit}
               style={{ marginTop: 16 }}
             />
